@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fine Evader</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-geosearch/dist/geosearch.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Fine Evader</h1>
+  <div class="disclaimer">
+    DRIVE RESPONSIBLY, WEAR A HELMET, AVOID UNFAIR FINES.
+  </div>
+  
+  <!-- Floating Note on map -->
+  <div class="floating-note">
+    Tap or click on the map to place a marker for traffic fines.
+  </div>
+
+  <!-- Map Container -->
+  <div id="map"></div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <img src="/icons/traffic-police.png" alt="Traffic Police Icon">
+    <span>Traffic Fine</span>
+  </div>
+
+  <!-- Footer with developer info -->
+  <div class="footer">
+    Developed with passion by SYZA Tech. Reach out to SYZA Tech at <a href="mailto:syzatech2025@gmail.com">syzatech2025@gmail.com</a>.
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-geosearch/dist/bundle.min.js"></script>
+  <script src="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

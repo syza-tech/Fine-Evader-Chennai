@@ -1,0 +1,198 @@
+/* General Body Styling */
+body {
+  margin: 0;
+  font-family: 'Orbitron', sans-serif; /* Updated font for a futuristic feel */
+  background-color: #202020;
+  color: white;
+  text-align: center;
+}
+
+/* Title Styling */
+h1 {
+  color: #f44336; /* Red color for title */
+  font-family: 'Orbitron', sans-serif; /* Futuristic font */
+  letter-spacing: 2px; /* Slight spacing for a polished look */
+  font-size: 40px;
+  margin-top: 20px;
+  text-shadow: 0 0 10px rgba(244, 67, 54, 0.7); /* Glow effect */
+}
+
+/* Disclaimer Styling */
+.disclaimer {
+  font-size: 16px;
+  margin: 15px 0;
+  font-weight: 700;
+  color: #f44336; /* Red color to match the theme */
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-family: 'Orbitron', sans-serif; /* Futuristic font */
+  text-shadow: 0 0 10px rgba(244, 67, 54, 0.7); /* Subtle glow effect */
+}
+
+/* Map Container */
+#map {
+  height: 90vh;
+  width: 100%;
+  position: relative;
+}
+
+/* Floating Note */
+.floating-note {
+  position: absolute;
+  top: 40%; /* Center it vertically */
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 10px;
+  background-color: rgba(0, 0, 0, 0.7);
+  color: white;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  font-family: 'Orbitron', sans-serif;
+  z-index: 1000;
+  animation: fadeOut 5s forwards; /* Note fades out after 5 seconds */
+}
+
+/* Floating Note Animation */
+@keyframes fadeOut {
+  0% {
+      opacity: 1;
+  }
+  100% {
+      opacity: 0;
+      display: none;
+  }
+}
+
+/* Footer Styling */
+.footer {
+  position: fixed;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 14px;
+  color: #f44336; /* Red color */
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 1px;
+  z-index: 1000;
+}
+
+.footer a {
+  color: #f44336;
+  text-decoration: none;
+}
+
+.footer a:hover {
+  color: #d32f2f;
+}
+
+/* Legend Styling */
+.legend {
+  position: absolute;
+  bottom: 10px; /* Bottom of the screen */
+  left: 10px; /* Tucked into the bottom-left corner */
+  background-color: rgba(0, 0, 0, 0.5); /* Lightly transparent for a softer look */
+  padding: 2px 4px; /* Even smaller padding */
+  border-radius: 4px; /* Slightly rounded corners */
+  font-family: 'Orbitron', sans-serif;
+  font-size: 5px; /* Tiny font for compact display */
+  color: white;
+  display: flex;
+  flex-direction: column; /* Stack items vertically */
+  gap: 1px; /* Minimal gap between legend items */
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3); /* Light shadow for depth */
+  z-index: 1000; /* Stay on top */
+  max-width: 60px; /* Even more compact width */
+}
+
+/* Title Styling */
+.legend-title {
+  font-size: 6px; /* Slightly larger for the title */
+  color: #f44336; /* Red for emphasis */
+  text-transform: uppercase; /* Bold and clear */
+  letter-spacing: 0.3px; /* Subtle spacing for clarity */
+  margin-bottom: 2px; /* Minimal space below the title */
+  text-align: center; /* Center-align the title */
+}
+
+/* Individual Legend Items */
+.legend-item {
+  display: flex;
+  align-items: center; /* Align icon and text */
+  gap: 1px; /* Minimal space between icon and text */
+}
+
+/* Icon Styling */
+.legend-icon {
+  width: 5px; /* Tiny icon size */
+  height: 5px; /* Match size with compact design */
+}
+
+/* Text Styling */
+.legend-text {
+  font-size: 5px; /* Match legend text size */
+  color: white;
+  white-space: nowrap; /* Prevent text wrapping */
+}
+
+/* Button Styling for Popups */
+.popup-content button {
+  padding: 6px 12px;
+  margin: 5px 0;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  color: white;
+  background-color: #333; /* Dark background for buttons */
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 1px;
+  font-size: 14px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.popup-content button:hover {
+  background-color: #f44336; /* Bright red on hover */
+  transform: scale(1.05); /* Slight zoom effect */
+}
+
+.popup-content button:active {
+  background-color: #d32f2f; /* Slightly darker red on click */
+  transform: scale(0.95); /* Slight shrink effect */
+}
+
+/* Specific Button Colors */
+.edit-btn {
+  background-color: #4caf50; /* Green for edit */
+}
+
+.edit-btn:hover {
+  background-color: #66bb6a; /* Light green on hover */
+}
+
+.delete-btn {
+  background-color: #f44336; /* Red for delete */
+}
+
+.delete-btn:hover {
+  background-color: #e53935; /* Slightly brighter red on hover */
+}
+
+/* Leaflet Map Controls */
+.leaflet-bar {
+  background-color: #333;
+}
+
+/* Marker Icon Styling */
+.leaflet-div-icon {
+  background: rgba(244, 67, 54, 0.9); /* Neon red background */
+  border-radius: 50%;
+  width: 35px;
+  height: 35px;
+  text-align: center;
+  line-height: 35px;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 18px;
+  color: white;
+  box-shadow: 0 0 5px rgba(244, 67, 54, 0.8); /* Glowing effect */
+}
