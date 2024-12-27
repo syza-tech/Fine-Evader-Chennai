@@ -9,14 +9,52 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
 
 // Create the custom icon for traffic police
 const trafficPoliceIcon = L.icon({
-    iconUrl: '/icons/traffic-police.png', // Correct path for public access
-    iconSize: [32, 32],  // Size of the icon (adjust as needed)
-    iconAnchor: [16, 32], // Position of the marker (centered)
-    popupAnchor: [0, -32] // Position of the popup above the marker
+    iconUrl: '/icons/traffic-police.png',
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+    popupAnchor: [0, -32]
 });
 
-// Store markers globally as L.marker objects
-let markers = []; 
+// Initialize the search provider
+const provider = new GeoSearch.OpenStreetMapProvider();
+
+// Initialize markers array
+let markers = [];
+
+// Add search functionality
+const searchInput = document.getElementById('search-input');
+const searchButton = document.getElementById('search-button');
+
+async function handleSearch() {
+    const query = searchInput.value;
+    if (!query) return;
+
+    try {
+        const results = await provider.search({ query });
+        if (results.length > 0) {
+            const { x: lng, y: lat } = results[0];
+            map.setView([lat, lng], 15);
+            // Optional: Add a temporary marker at the searched location
+            L.marker([lat, lng])
+                .addTo(map)
+                .bindPopup('Searched Location')
+                .openPopup();
+        } else {
+            alert('Location not found');
+        }
+    } catch (error) {
+        console.error('Search failed:', error);
+        alert('Search failed. Please try again.');
+    }
+}
+
+// Add event listeners for search
+searchButton.addEventListener('click', handleSearch);
+searchInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+        handleSearch();
+    }
+});
 
 // Fetch and display existing markers
 fetch('/api/markers')
@@ -34,8 +72,8 @@ function addMarkerToMap(markerData) {
     marker.bindPopup(
         `<div class="popup-content">
             <p><strong>Note:</strong> ${markerData.note || "No note"}</p>
-            <button onclick="editMarker(${markerData.id})"><i class="fas fa-edit"></i> Edit</button>
-            <button onclick="deleteMarker(${markerData.id})"><i class="fas fa-trash"></i> Delete</button>
+            <button onclick="editMarker(${markerData.id})">Edit</button>
+            <button onclick="deleteMarker(${markerData.id})">Delete</button>
         </div>`
     );    
 
@@ -61,8 +99,8 @@ map.on('click', function (e) {
     })
         .then(response => response.json())
         .then(savedMarker => {
-            const addedMarker = addMarkerToMap(savedMarker); // Add the new marker to the map
-            markers.push(addedMarker); // Save the new marker locally
+            const addedMarker = addMarkerToMap(savedMarker);
+            markers.push(addedMarker);
         })
         .catch(err => console.error('Failed to add marker:', err));
 });
@@ -83,17 +121,15 @@ function editMarker(id) {
         })
         .then(data => {
             if (data.success) {
-                // Find the marker object from the array and update it directly on the map
                 const markerData = markers.find(m => m.id === id);
                 if (markerData) {
-                    // Update the note on the popup
                     const updatedPopupContent = 
                         `<div class="popup-content">
                             <p><strong>Note:</strong> ${newNote}</p>
                             <button onclick="editMarker(${id})">Edit</button>
                             <button onclick="deleteMarker(${id})">Delete</button>
                         </div>`;
-                    markerData.marker.setPopupContent(updatedPopupContent); // Update popup content
+                    markerData.marker.setPopupContent(updatedPopupContent);
                 }
             } else {
                 alert("Failed to update the marker.");
@@ -113,11 +149,10 @@ function deleteMarker(id) {
         })
         .then(data => {
             if (data.success) {
-                // Remove the marker from the map and the markers array
                 const markerData = markers.find(m => m.id === id);
                 if (markerData) {
-                    markers = markers.filter(m => m.id !== id); // Remove from the markers array
-                    map.removeLayer(markerData.marker); // Remove the marker from the map
+                    markers = markers.filter(m => m.id !== id);
+                    map.removeLayer(markerData.marker);
                 }
             } else {
                 alert("Failed to delete the marker.");
