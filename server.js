@@ -5,7 +5,7 @@ const Database = require('better-sqlite3');
 
 // Initialize the app and database
 const app = express();
-const db = new Database('markers.db');
+const db = new Database('./data/markers.db');
 
 // Middleware
 app.use(bodyParser.json());
