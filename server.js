@@ -1,92 +1,87 @@
 const express = require('express');
 const path = require('path');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const Database = require('better-sqlite3');
 
-// Initialize the app and database
 const app = express();
-const db = new Database('./data/markers.db');
+const PORT = process.env.PORT || 3000;
 
-// Middleware
-app.use(bodyParser.json());
-app.use(express.static(path.join(__dirname, 'public'))); // Serve static files from 'public' folder
+// DB (file markers.db in project root)
+const db = new Database(path.join(__dirname, 'markers.db'));
 
-// Create the markers table if it doesn’t exist
+// Ensure table exists
 db.exec(`
-    CREATE TABLE IF NOT EXISTS markers (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        lat REAL NOT NULL,
-        lng REAL NOT NULL,
-        note TEXT
-    );
+  CREATE TABLE IF NOT EXISTS markers (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    lat REAL NOT NULL,
+    lng REAL NOT NULL,
+    note TEXT
+  );
 `);
 
-// API: Get all markers
+app.use(cors());
+app.use(bodyParser.json());
+app.use(express.static(path.join(__dirname, 'public')));
+
+// API: get all markers
 app.get('/api/markers', (req, res) => {
-    try {
-        const markers = db.prepare('SELECT * FROM markers').all();
-        res.json(markers);
-    } catch (error) {
-        console.error('Error fetching markers:', error);
-        res.status(500).json({ error: 'Failed to fetch markers' });
-    }
+  try {
+    const rows = db.prepare('SELECT * FROM markers').all();
+    res.json(rows);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to fetch markers' });
+  }
 });
 
-// API: Add a new marker
+// API: create marker
 app.post('/api/markers', (req, res) => {
-    const { lat, lng, note } = req.body;
-    try {
-        const result = db.prepare('INSERT INTO markers (lat, lng, note) VALUES (?, ?, ?)').run(lat, lng, note || "No note");
-        res.json({ id: result.lastInsertRowid, lat, lng, note });
-    } catch (error) {
-        console.error('Error adding marker:', error);
-        res.status(500).json({ error: 'Failed to add marker' });
-    }
+  const { lat, lng, note } = req.body;
+  try {
+    const stmt = db.prepare('INSERT INTO markers (lat, lng, note) VALUES (?, ?, ?)');
+    const info = stmt.run(lat, lng, note || 'No note');
+    res.json({ id: info.lastInsertRowid, lat, lng, note: note || 'No note' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to add marker' });
+  }
 });
 
-// API: Edit a marker
+// API: update marker note
 app.put('/api/markers/:id', (req, res) => {
-    const { id } = req.params;
-    const { note } = req.body;
-
-    try {
-        const result = db.prepare('UPDATE markers SET note = ? WHERE id = ?').run(note, id);
-
-        if (result.changes > 0) {
-            res.json({ success: true });
-        } else {
-            res.status(404).json({ error: 'Marker not found' });
-        }
-    } catch (error) {
-        console.error('Error editing marker:', error);
-        res.status(500).json({ error: 'Failed to edit marker' });
-    }
+  const { id } = req.params;
+  const { note } = req.body;
+  try {
+    const stmt = db.prepare('UPDATE markers SET note = ? WHERE id = ?');
+    const info = stmt.run(note, id);
+    if (info.changes > 0) res.json({ success: true });
+    else res.status(404).json({ error: 'Marker not found' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to update marker' });
+  }
 });
 
-// API: Delete a marker
+// API: delete marker
 app.delete('/api/markers/:id', (req, res) => {
-    const { id } = req.params;
-
-    try {
-        const result = db.prepare('DELETE FROM markers WHERE id = ?').run(id);
-        if (result.changes > 0) {
-            res.json({ success: true });
-        } else {
-            res.status(404).json({ error: 'Marker not found' });
-        }
-    } catch (error) {
-        console.error('Error deleting marker:', error);
-        res.status(500).json({ error: 'Failed to delete marker' });
-    }
+  const { id } = req.params;
+  try {
+    const stmt = db.prepare('DELETE FROM markers WHERE id = ?');
+    const info = stmt.run(id);
+    if (info.changes > 0) res.json({ success: true });
+    else res.status(404).json({ error: 'Marker not found' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: 'Failed to delete marker' });
+  }
 });
 
-// Catch-all route to serve the frontend
+// Catch-all to serve frontend
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Start the server
-const PORT = 3000;
 app.listen(PORT, () => {
-    console.log(`Server is running at http://localhost:${PORT}`);
+  console.log(`Server running at http://localhost:${PORT}`);
 });
