@@ -1,49 +1,36 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Fine Evader</title>
+
+  <!-- Leaflet CSS (kept as you used) -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet-geosearch/dist/geosearch.css" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.css" />
-  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
+
+  <!-- Your CSS -->
+  <link rel="stylesheet" href="style.css" />
+
+  <link rel="icon" href="/icons/traffic-police.png" />
 </head>
 <body>
-  <h1>Fine Evader</h1>
-  <div class="disclaimer">
-    DRIVE RESPONSIBLY, WEAR A HELMET, AVOID UNFAIR FINES AND WARN A BROTHER.
-  </div>
-  
-  <!-- Search Container -->
-  <div class="search-container">
-    <input type="text" id="search-input" placeholder="Search location...">
-    <button id="search-button">Search</button>
-  </div>
+  <header>
+    Fine Evader
+    <div class="disclaimer">Drive safely and responsibly. Wear a helmet, follow traffic rules, and avoid unfair fines.</div>
+  </header>
 
-  <!-- Floating Note on map -->
-  <div class="floating-note">
-    Tap or click on the map to place a marker for traffic fines.
-  </div>
-
-  <!-- Map Container -->
   <div id="map"></div>
 
-  <!-- Legend -->
-  <div class="legend">
-    <img src="/icons/traffic-police.png" alt="Traffic Police Icon">
-    <span>Traffic Fine</span>
+  <!-- Small search + locate floating controls -->
+  <div id="controls">
+    <input id="search-input" placeholder="Search a street or place and press Enter" />
+    <button id="locate-btn" title="Locate me">📍</button>
   </div>
 
-  <!-- Footer with developer info -->
-  <div class="footer">
-    Developed with passion by SYZA Tech. Reach out to SYZA Tech at <a href="mailto:syzatech2025@gmail.com">syzatech2025@gmail.com</a>.
-  </div>
-
+  <!-- Leaflet JS -->
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/leaflet-geosearch/dist/bundle.min.js"></script>
-  <script src="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.js"></script>
+
+  <!-- App script -->
   <script src="app.js"></script>
 </body>
 </html>
