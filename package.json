@@ -1,18 +1,19 @@
 {
   "name": "traffic-police-map",
   "version": "1.0.0",
-  "main": "index.js",
+  "description": "Traffic police map with markers, search and locate",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "postinstall": "npm rebuild better-sqlite3 --build-from-source"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
   "dependencies": {
-    "better-sqlite3": "^11.7.0",
-    "bootstrap": "^5.3.3",
-    "express": "^4.21.2",
-    "leaflet": "^1.9.4"
+    "better-sqlite3": "^8.4.0",
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
