@@ -1,162 +1,172 @@
-// Initialize the map
-const map = L.map('map').setView([13.0827, 80.2707], 13); // Default location: Chennai
+// Initialize map (same look & center)
+const map = L.map('map').setView([13.0827, 80.2707], 13);
 
-// Add a dark tile layer (background map with black/grey aesthetic)
+// Dark Carto tiles (keeps your original map color)
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    maxZoom: 19,
-    attribution: '© OpenStreetMap contributors © CARTO'
+  maxZoom: 19,
+  attribution: '© OpenStreetMap contributors © CARTO'
 }).addTo(map);
 
-// Create the custom icon for traffic police
+// Custom icon (make sure file is at public/icons/traffic-police.png)
 const trafficPoliceIcon = L.icon({
-    iconUrl: '/icons/traffic-police.png',
-    iconSize: [32, 32],
-    iconAnchor: [16, 32],
-    popupAnchor: [0, -32]
+  iconUrl: '/icons/traffic-police.png',
+  iconSize: [36, 36],
+  iconAnchor: [18, 36],
+  popupAnchor: [0, -36]
 });
 
-// Initialize the search provider
-const provider = new GeoSearch.OpenStreetMapProvider();
+// Global markers array to track marker objects
+let markers = []; // { id, marker }
 
-// Initialize markers array
-let markers = [];
-
-// Add search functionality
-const searchInput = document.getElementById('search-input');
-const searchButton = document.getElementById('search-button');
-
-async function handleSearch() {
-    const query = searchInput.value;
-    if (!query) return;
-
-    try {
-        const results = await provider.search({ query });
-        if (results.length > 0) {
-            const { x: lng, y: lat } = results[0];
-            map.setView([lat, lng], 15);
-            // Optional: Add a temporary marker at the searched location
-            L.marker([lat, lng])
-                .addTo(map)
-                .bindPopup('Searched Location')
-                .openPopup();
-        } else {
-            alert('Location not found');
-        }
-    } catch (error) {
-        console.error('Search failed:', error);
-        alert('Search failed. Please try again.');
-    }
-}
-
-// Add event listeners for search
-searchButton.addEventListener('click', handleSearch);
-searchInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-        handleSearch();
-    }
-});
-
-// Fetch and display existing markers
+// Load existing markers from server
 fetch('/api/markers')
-    .then(response => response.json())
-    .then(data => {
-        markers = data.map(markerData => {
-            return addMarkerToMap(markerData);
-        });
-    })
-    .catch(err => console.error('Failed to fetch markers:', err));
+  .then(r => r.json())
+  .then(data => {
+    data.forEach(m => {
+      const item = addMarkerToMap(m);
+      markers.push(item);
+    });
+  })
+  .catch(err => console.error('Failed to load markers', err));
 
-// Utility to add a marker to the map
-function addMarkerToMap(markerData) {
-    const marker = L.marker([markerData.lat, markerData.lng], { icon: trafficPoliceIcon }).addTo(map);
-    marker.bindPopup(
-        `<div class="popup-content">
-            <p><strong>Note:</strong> ${markerData.note || "No note"}</p>
-            <button onclick="editMarker(${markerData.id})">Edit</button>
-            <button onclick="deleteMarker(${markerData.id})">Delete</button>
-        </div>`
-    );    
-
-    // Attach the marker ID to the marker object for later reference
-    marker._id = markerData.id;
-
-    // Store the marker object in the global markers array
-    return { id: markerData.id, marker }; 
+// Utility: build popup HTML for a marker
+function popupHtml(marker) {
+  // note textarea (editable above marker), Save and Delete color-coded buttons
+  return `
+    <div class="popup-content">
+      <textarea id="note-${marker.id}" class="popup-textarea">${escapeHtml(marker.note || '')}</textarea>
+      <div class="popup-buttons">
+        <button class="save-btn" onclick="saveNote(${marker.id})">Save</button>
+        <button class="delete-btn" onclick="deleteMarker(${marker.id})">Delete</button>
+      </div>
+    </div>
+  `;
 }
 
-// Click to add a marker
-map.on('click', function (e) {
-    const note = prompt("Add a note for this marker:");
-    if (!note) return; // Exit if no note is provided
+// Escape HTML to avoid injection in popup
+function escapeHtml(text) {
+  if (!text) return '';
+  return String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
 
-    const newMarker = { lat: e.latlng.lat, lng: e.latlng.lng, note };
+// Add marker object to map and return { id, marker }
+function addMarkerToMap(m) {
+  const marker = L.marker([m.lat, m.lng], { icon: trafficPoliceIcon }).addTo(map);
+  marker.bindPopup(popupHtml(m), { minWidth: 220 });
+  marker._markerId = m.id;
+  return { id: m.id, marker };
+}
 
-    // Send the marker to the server
-    fetch('/api/markers', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newMarker)
+// Click to add a marker (keeps your original behaviour: prompt then save)
+map.on('click', function(e) {
+  const note = prompt('Add a note for this marker:');
+  if (!note) return;
+  const payload = { lat: e.latlng.lat, lng: e.latlng.lng, note };
+
+  fetch('/api/markers', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  })
+    .then(r => r.json())
+    .then(saved => {
+      const item = addMarkerToMap(saved);
+      markers.push(item);
     })
-        .then(response => response.json())
-        .then(savedMarker => {
-            const addedMarker = addMarkerToMap(savedMarker);
-            markers.push(addedMarker);
-        })
-        .catch(err => console.error('Failed to add marker:', err));
+    .catch(err => console.error('Failed to add marker', err));
 });
 
-// Edit a marker
-function editMarker(id) {
-    const newNote = prompt("Edit the note for this marker:");
-    if (!newNote) return;
+// Save note (PUT)
+window.saveNote = function(id) {
+  const ta = document.getElementById(`note-${id}`);
+  if (!ta) return alert('Unable to find note field.');
+  const newNote = ta.value;
 
-    fetch(`/api/markers/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ note: newNote })
+  fetch(`/api/markers/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ note: newNote })
+  })
+    .then(resp => {
+      if (!resp.ok) throw new Error('Failed to save');
+      // update textarea stays as is; optionally give a tiny confirmation
+      ta.style.border = '1px solid #4caf50';
+      setTimeout(() => ta.style.border = '', 700);
     })
-        .then(response => {
-            if (!response.ok) throw new Error("Failed to edit marker");
-            return response.json();
+    .catch(err => {
+      console.error(err);
+      alert('Failed to save note.');
+    });
+};
+
+// Delete marker (DELETE)
+window.deleteMarker = function(id) {
+  if (!confirm('Delete this marker?')) return;
+  fetch(`/api/markers/${id}`, { method: 'DELETE' })
+    .then(resp => {
+      if (!resp.ok) throw new Error('Failed to delete');
+      // remove from map and local array
+      const found = markers.find(x => x.id === id);
+      if (found) {
+        map.removeLayer(found.marker);
+        markers = markers.filter(x => x.id !== id);
+      } else {
+        // fallback: try to remove by scanning markers on map
+        map.eachLayer(layer => {
+          if (layer instanceof L.Marker && layer._markerId === id) map.removeLayer(layer);
+        });
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      alert('Failed to delete marker.');
+    });
+};
+
+// ========== SEARCH (Nominatim) ==========
+// Small search input (Enter to search) - behavior like Google Maps search (address -> zoom)
+const searchInput = document.getElementById('search-input');
+if (searchInput) {
+  searchInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      const q = searchInput.value.trim();
+      if (!q) return;
+      // Nominatim query (rate-limited, no API key)
+      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}`)
+        .then(r => r.json())
+        .then(results => {
+          if (!results || results.length === 0) return alert('Location not found');
+          const place = results[0];
+          const lat = parseFloat(place.lat), lon = parseFloat(place.lon);
+          map.setView([lat, lon], 16);
         })
-        .then(data => {
-            if (data.success) {
-                const markerData = markers.find(m => m.id === id);
-                if (markerData) {
-                    const updatedPopupContent = 
-                        `<div class="popup-content">
-                            <p><strong>Note:</strong> ${newNote}</p>
-                            <button onclick="editMarker(${id})">Edit</button>
-                            <button onclick="deleteMarker(${id})">Delete</button>
-                        </div>`;
-                    markerData.marker.setPopupContent(updatedPopupContent);
-                }
-            } else {
-                alert("Failed to update the marker.");
-            }
-        })
-        .catch(err => console.error('Failed to edit marker:', err));
+        .catch(err => {
+          console.error('Search error', err);
+          alert('Search failed');
+        });
+    }
+  });
 }
 
-// Delete a marker
-function deleteMarker(id) {
-    fetch(`/api/markers/${id}`, {
-        method: 'DELETE'
-    })
-        .then(response => {
-            if (!response.ok) throw new Error("Failed to delete marker");
-            return response.json();
-        })
-        .then(data => {
-            if (data.success) {
-                const markerData = markers.find(m => m.id === id);
-                if (markerData) {
-                    markers = markers.filter(m => m.id !== id);
-                    map.removeLayer(markerData.marker);
-                }
-            } else {
-                alert("Failed to delete the marker.");
-            }
-        })
-        .catch(err => console.error('Failed to delete marker:', err));
+// ========== LOCATE ME ==========
+const locateBtn = document.getElementById('locate-btn');
+if (locateBtn) {
+  locateBtn.addEventListener('click', () => {
+    map.locate({ setView: true, maxZoom: 16 });
+  });
+
+  // optional: show a marker when location found
+  map.on('locationfound', e => {
+    // small temporary circle to show position
+    const radius = e.accuracy || 50;
+    L.circle(e.latlng, { radius, color: '#4caf50', fillOpacity: 0.2 }).addTo(map).bindPopup('You are here').openPopup();
+  });
+
+  map.on('locationerror', e => {
+    alert('Unable to locate you: ' + e.message);
+  });
 }
