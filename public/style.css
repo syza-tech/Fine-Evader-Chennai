@@ -1,190 +1,127 @@
-/* General Body Styling */
+/* Base look (keeps your dark theme vibe) */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500&display=swap');
+
+* { box-sizing: border-box; }
+
 body {
   margin: 0;
   font-family: 'Orbitron', sans-serif;
-  background-color: #202020;
-  color: white;
-  text-align: center;
+  background-color: #121212;
+  color: #fff;
 }
 
-/* Title Styling */
-h1 {
-  color: #f44336;
-  font-family: 'Orbitron', sans-serif;
-  letter-spacing: 2px;
-  font-size: 40px;
-  margin-top: 20px;
-  text-shadow: 0 0 10px rgba(244, 67, 54, 0.7);
-}
-
-/* Search Container Styling */
-.search-container {
-  position: fixed;
-  top: 120px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 1000;
-  display: flex;
-  gap: 10px;
-  background: rgba(0, 0, 0, 0.7);
-  padding: 10px;
-  border-radius: 8px;
-}
-
-#search-input {
-  padding: 8px 12px;
-  border: 2px solid #f44336;
-  border-radius: 4px;
-  background: rgba(0, 0, 0, 0.8);
-  color: white;
-  font-family: 'Orbitron', sans-serif;
-  width: 250px;
-}
-
-#search-button {
-  padding: 8px 16px;
-  background: #f44336;
-  border: none;
-  border-radius: 4px;
-  color: white;
-  cursor: pointer;
-  font-family: 'Orbitron', sans-serif;
-  transition: background-color 0.3s;
-}
-
-#search-button:hover {
-  background: #d32f2f;
-}
-
-/* Disclaimer Styling */
-.disclaimer {
-  font-size: 16px;
-  margin: 15px 0;
-  font-weight: 700;
-  color: #f44336;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  font-family: 'Orbitron', sans-serif;
-  text-shadow: 0 0 10px rgba(244, 67, 54, 0.7);
-}
-
-/* Map Container */
-#map {
-  height: 90vh;
+/* Header & disclaimer */
+header {
   width: 100%;
-  position: relative;
-}
-
-/* Floating Note */
-.floating-note {
-  position: absolute;
-  top: 40%;
-  left: 50%;
-  transform: translateX(-50%);
-  padding: 10px;
-  background-color: rgba(0, 0, 0, 0.7);
-  color: white;
-  border-radius: 8px;
-  font-size: 16px;
+  padding: 12px 0;
+  background-color: #151515;
+  color: #f44336;
+  text-align: center;
+  font-size: 1.6rem;
   font-weight: 700;
   letter-spacing: 1px;
-  font-family: 'Orbitron', sans-serif;
-  z-index: 1000;
-  animation: fadeOut 5s forwards;
-}
-
-/* Floating Note Animation */
-@keyframes fadeOut {
-  0% {
-      opacity: 1;
-  }
-  100% {
-      opacity: 0;
-      display: none;
-  }
-}
-
-/* Footer Styling */
-.footer {
-  position: fixed;
-  bottom: 10px;
-  left: 50%;
-  transform: translateX(-50%);
-  font-size: 14px;
-  color: #f44336;
-  font-family: 'Orbitron', sans-serif;
-  letter-spacing: 1px;
-  z-index: 1000;
-}
-
-.footer a {
-  color: #f44336;
-  text-decoration: none;
-}
-
-.footer a:hover {
-  color: #d32f2f;
-}
-
-/* Legend Styling */
-.legend {
   position: absolute;
-  bottom: 10px;
-  left: 10px;
-  background-color: rgba(0, 0, 0, 0.5);
-  padding: 2px 4px;
-  border-radius: 4px;
-  font-family: 'Orbitron', sans-serif;
-  font-size: 5px;
-  color: white;
-  display: flex;
-  flex-direction: column;
-  gap: 1px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  top: 0;
   z-index: 1000;
-  max-width: 60px;
 }
 
-/* Button Styling for Popups */
-.popup-content button {
-  padding: 6px 12px;
-  margin: 5px 0;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  color: white;
-  background-color: #333;
-  font-family: 'Orbitron', sans-serif;
-  letter-spacing: 1px;
+header .disclaimer {
+  font-size: 0.8rem;
+  color: #ddd;
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+/* Map fills the screen under header */
+#map {
+  width: 100%;
+  height: 100vh;
+  padding-top: 60px;
+}
+
+/* Controls (search + locate) - small and centered-left */
+#controls, #controls * { box-sizing: border-box; }
+#controls {
+  position: absolute;
+  top: 72px;
+  left: 12px;
+  z-index: 1200;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* Search input */
+#search-input {
+  width: 260px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 2px solid #333;
+  background: #222;
+  color: #fff;
+  outline: none;
   font-size: 14px;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.6);
 }
 
-.popup-content button:hover {
-  background-color: #f44336;
-  transform: scale(1.05);
+/* Locate button */
+#locate-btn {
+  background: linear-gradient(180deg,#4caf50,#388e3c);
+  color: #fff;
+  border: none;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+  font-size: 16px;
 }
 
-.popup-content button:active {
-  background-color: #d32f2f;
-  transform: scale(0.95);
+/* Popup content */
+.popup-content {
+  min-width: 220px;
+  color: #111;
 }
 
-/* Leaflet Map Controls */
-.leaflet-bar {
-  background-color: #333;
+/* Textarea in popup */
+.popup-textarea {
+  width: 100%;
+  min-height: 60px;
+  resize: vertical;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 13px;
 }
 
-/* Marker Icon Styling */
-.leaflet-div-icon {
-  background: rgba(244, 67, 54, 0.9);
-  border-radius: 50%;
-  width: 35px;
-  height: 35px;
-  text-align: center;
-  line-height: 35px;
-  font-family: 'Orbitron', sans-serif;
-  font-size: 18px;
-  color: white;
-  box-shadow: 0 0 5px rgba(244, 67, 54, 0.8);
+/* Buttons in popup */
+.popup-buttons {
+  margin-top: 8px;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.save-btn {
+  background: linear-gradient(180deg,#1976d2,#1565c0);
+  color: #fff;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.delete-btn {
+  background: linear-gradient(180deg,#f44336,#d32f2f);
+  color: #fff;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+/* Small responsive tweaks */
+@media (max-width: 520px) {
+  #search-input { width: 180px; }
 }
